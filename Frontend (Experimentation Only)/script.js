@@ -29,29 +29,39 @@ document.addEventListener('DOMContentLoaded', () => {
       // Simulate the login process
       responseDiv.innerText = 'Logging in...';
       await simulateAPI('/login', data);
+
+     // Check if the logout button was clicked before displaying "Login successful" message
+     if (!isLogoutButtonClicked) {
       responseDiv.innerText = 'Login successful.';
-      loginForm.reset();
-    });
+    } else {
+      // If logout button was clicked, reset the flag and do not show "Login successful" message
+      isLogoutButtonClicked = false;
+    }
+
+    loginForm.reset();
+  });
+
+    let isLogOutButtonClicked = false;
 
     // Logout function
     const logoutButton = document.getElementById('logoutButton');
-    logoutButton.addEventListener('click', async () => {
-      responseDiv.innerText = 'Logging out...';
-      try {
-        const response = await fetch('/logout', {
-          method: 'POST',
-        });
-        // Logic for post response outcome
-        if (response.ok) {
-          responseDiv.innerText = 'Logged out successfully.';
-        } else {
-          responseDiv.innerText = 'Failed to log out.';
-        }
-      } catch (error) {
-        responseDiv.innerText = 'An error occurred while logging out.';
+  logoutButton.addEventListener('click', async () => {
+    isLogoutButtonClicked = true; // Set the flag to true when logout button is clicked
+    responseDiv.innerText = 'Logging out...';
+    try {
+      const response = await fetch('/logout', {
+        method: 'POST',
+      });
+      // Logic for post response outcome
+      if (response.ok) {
+        responseDiv.innerText = 'Logged out successfully.';
+      } else {
+        responseDiv.innerText = 'Failed to log out.';
       }
-    });
-
+    } catch (error) {
+      responseDiv.innerText = 'An error occurred while logging out.';
+    }
+  });
   
     // Simulate API call (fake delay for demonstration purposes)
     function simulateAPI(endpoint, data) {
