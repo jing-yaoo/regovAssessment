@@ -2,6 +2,7 @@
 const express = require('express'); 
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
+const session = require('express-session');
 
 const app = express();
 const port = 3000;
@@ -27,6 +28,13 @@ db.connect((err) => {
 // Set parsing for JSON data requests
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: 'session_key', // placeholder key
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // Register a new user
 app.post('/register', (req, res) => {
@@ -49,6 +57,11 @@ app.post('/login', (req, res) => {
   // Selecting users which match the credentials
   const sql = 'SELECT * FROM users WHERE username = ? AND password = ?';
   db.query(sql, [username, password], (err, result) => {
+    // If the user is found, set the user data in the session to simulate successful login
+    req.session.user = {
+      id: result[0].id, //id is the primary key of my user_registration database
+      username: result[0].username,
+    }
     // Error handling and status response
     if (err) {
       console.error('Error logging in: ', err);
@@ -65,13 +78,25 @@ app.post('/login', (req, res) => {
 });
 
 // // Logout function
-// app.post('/logout', (req, res)) => {
-//   const { username, password } = req.body;
-// });
+  app.post('/logout', (req, res) => {
+    if (!req.session.user) {
+      // If the user is not logged in, they cannot log out.
+      return res.status(401).send('You are not logged in.');
+    }
+  
+    // If the user is logged in, clear the session to simulate log out
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error while logging out: ', err);
+        return res.status(500).send('An error occurred while logging out.');
+      }
+      res.status(200).send('Logged out successfully.');
+    });
+  });
 
-// app.get('/', (req, res) => {
-//   res.status(200).send("test");
-// })
+/* app.get('/', (req, res) => {
+  res.status(200).send("test");
+}) */
 
 
 app.listen(port, () => {
