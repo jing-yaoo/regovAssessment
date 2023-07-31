@@ -69,6 +69,10 @@ app.post('/login', (req, res) => {
 //   const { username, password } = req.body;
 // });
 
+// app.get('/', (req, res) => {
+//   res.status(200).send("test");
+// })
+
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
